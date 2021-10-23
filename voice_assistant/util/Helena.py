@@ -1,4 +1,5 @@
 # import all necessary modules
+import threading
 import time
 
 import pyttsx3
@@ -13,6 +14,7 @@ import psutil
 
 from wikipedia.wikipedia import search
 from pygame import mixer
+from util import screenshots_filename_generator, search_engine, search_control
 
 
 class Helena:
@@ -61,11 +63,11 @@ class Helena:
 
         return query
 
-    # User data writting function
+    # User data writing function
     def user_data(self):
-        self.speak("May i know your name ?")
-        username = self.take_command()
-        data = open("data.txt", "w")
+        self.speak("May i know your name?")
+        username = self.take_command().lower()
+        data = open("../memoryCenter/userData.txt", "w")
         data.write(username)
         data.close()
 
@@ -77,7 +79,7 @@ class Helena:
             self.speak("Good morning")
         elif 12 <= hour < 18:
             self.speak("Good afternoon")
-        elif 18 <= hour < 24:
+        elif 18 <= hour < 6:
             self.speak("Good evening")
 
     # Return current time
@@ -93,36 +95,68 @@ class Helena:
     def wikipedia_search(self):
         self.speak("what should I look for?")
         query = self.take_command().lower()
-        self.speak("Searching for "+query)
+        self.speak("Searching for " + query)
         wikipedia.set_lang("en")
         time.sleep(0.3)
         result = wikipedia.summary(query, sentences=2)
         self.speak(result)
 
-    def google_search(self):
-        self.speak("what should i look for?")
-        query = self.take_command().lower()
-        self.speak("Searching for "+query)
-        wb.open(query)
-
-    def to_remember(self, memory):
-        self.speak("What should i remember ?")
-        memoryCenter = open("memory_center", "a")
+    def to_remember(self):
+        self.speak("What should i remember?")
+        memory = self.take_command()
+        memoryCenter = open("../memoryCenter/memoryCenter", "a")
+        memory += str("\n")
         memoryCenter.write(memory)
         memoryCenter.close()
         self.speak("You told me to remember " + memory)
 
+    def file_launcher(self):
+        self.speak("Which file would you like to launch?")
+        to_launch = self.take_command().lower()
+        resultAvailable = threading.Event()
+        thread = threading.Thread(target=search_engine, args=[to_launch, resultAvailable, ])
+        thread.start()
+        search_control(resultAvailable, self.speak)
+
+    def screenshot(self):
+        img = pyautogui.screenshot()
+        filename = screenshots_filename_generator()
+        folder_path = os.path.normpath(os.path.expanduser("~/Pictures/")) + "\\"
+        file_path = folder_path + filename
+        img.save(file_path)
+
     def shutdown(self):
-        self.speak("Shutting down the computer")
-        os.system("shutdown /s /t 1")
+        self.speak("Do you really want to shutdown?")
+        answer = self.take_command().lower()
+        if answer == "yes":
+            self.speak("Shutting down the computer")
+            os.system("shutdown /s /t 1")
+        elif answer == "no":
+            self.speak("Process abort")
+        else:
+            self.speak("I do not understand. Process abort")
 
     def restart(self):
-        self.speak("Reboot")
-        os.system("shutdown /r /t 1")
+        self.speak("Do you really want to restart?")
+        answer = self.take_command().lower()
+        if answer == "yes":
+            self.speak("Reboot")
+            os.system("shutdown /r /t 1")
+        elif answer == "no":
+            self.speak("Process abort")
+        else:
+            self.speak("I do not understand. Process abort")
 
     def logout(self):
-        self.speak("Logout")
-        os.system("shutdown -l")
+        self.speak("Do you really want to logout?")
+        answer = self.take_command().lower()
+        if answer == "yes":
+            self.speak("Logout")
+            os.system("shutdown -l")
+        elif answer == "no":
+            self.speak("Process abort")
+        else:
+            self.speak("I do not understand. Process abort")
 
 
 if __name__ == "__module__":
