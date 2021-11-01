@@ -1,6 +1,7 @@
 # Import all dependencies
 import os
 import random
+import time
 from datetime import datetime
 
 import psutil
@@ -35,6 +36,20 @@ def screenshots_filename_generator():
     # Concat date and time and the random number
     filename = "screenshot_" + date + "_" + randomize + ".png"
     return filename
+
+
+def standby(standbyEvent):
+    counter = 0
+    while True:
+        if not standbyEvent.isSet():
+            break
+        time.sleep(1)
+        counter += 1
+        print("The timeout: ", counter)
+        if counter == 15:
+            standbyEvent.clear()
+            break
+
 
 
 def os_mount_points():

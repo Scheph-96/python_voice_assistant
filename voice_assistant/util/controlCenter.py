@@ -1,20 +1,18 @@
 # import all necessary modules
 import threading
 import time
+from pathlib import Path
 
 import pyttsx3
 import datetime
 import speech_recognition as sr
 import wikipedia
-import smtplib
-import webbrowser as wb
 import os
 import pyautogui
-import psutil
 
 from wikipedia.wikipedia import search
-from pygame import mixer
-from util import screenshots_filename_generator, search_engine, search_control
+from pygame import mixer, event
+from .utilities import screenshots_filename_generator, search_control, search_engine
 
 
 class Helena:
@@ -44,24 +42,24 @@ class Helena:
 
     # Order listening function
     def take_command(self):
+        print("speak")
         recognize = sr.Recognizer()
         with sr.Microphone() as source:
-            mixer.init()
-            mixer.music.load('helena_sound.mp3')
-            mixer.music.play()
             recognize.adjust_for_ambient_noise(source)
             audio = recognize.listen(source)
 
         try:
             print("Recognizing...")
             query = recognize.recognize_google(audio)
+            return query
         except Exception as e:
             print(e)
             self.speak("I do not understand what you are saying")
 
-            return "None"
-
-        return query
+    def sound_note(self):
+        mixer.init()
+        mixer.music.load(os.fspath(Path(__file__).resolve().parent / "sound/helena_sound.mp3"))
+        mixer.music.play()
 
     # User data writing function
     def user_data(self):
@@ -124,6 +122,7 @@ class Helena:
         folder_path = os.path.normpath(os.path.expanduser("~/Pictures/")) + "\\"
         file_path = folder_path + filename
         img.save(file_path)
+        self.speak("screenshot took successfully")
 
     def shutdown(self):
         self.speak("Do you really want to shutdown?")
