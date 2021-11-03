@@ -11,7 +11,7 @@ import os
 import pyautogui
 
 from wikipedia.wikipedia import search
-from pygame import mixer, event
+from pygame import mixer
 from .utilities import screenshots_filename_generator, search_control, search_engine
 
 
@@ -54,7 +54,8 @@ class Helena:
             return query
         except Exception as e:
             print(e)
-            self.speak("I do not understand what you are saying")
+            return ""
+            # self.speak("I do not understand what you are saying")
 
     def sound_note(self):
         mixer.init()
@@ -65,7 +66,7 @@ class Helena:
     def user_data(self):
         self.speak("May i know your name?")
         username = self.take_command().lower()
-        data = open("../memoryCenter/userData.txt", "w")
+        data = open(os.fspath(Path(__file__).resolve().parent / "memoryCenter/userData.txt"), "w")
         data.write(username)
         data.close()
 
@@ -91,7 +92,7 @@ class Helena:
         self.speak("Today's date is " + current_date)
 
     def wikipedia_search(self):
-        self.speak("what should I look for?")
+        self.speak("what should i look for?")
         query = self.take_command().lower()
         self.speak("Searching for " + query)
         wikipedia.set_lang("en")
@@ -102,7 +103,7 @@ class Helena:
     def to_remember(self):
         self.speak("What should i remember?")
         memory = self.take_command()
-        memoryCenter = open("../memoryCenter/memoryCenter", "a")
+        memoryCenter = open(os.fspath(Path(__file__).resolve().parent / "memoryCenter/memoryCenter"), "a")
         memory += str("\n")
         memoryCenter.write(memory)
         memoryCenter.close()

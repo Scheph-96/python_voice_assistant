@@ -1,7 +1,7 @@
 from threading import Thread, Event
 
-from .controlCenter import Helena
-from .utilities import standby
+from .helena import Helena
+from .utilities import task_controller
 
 query = None
 
@@ -13,29 +13,24 @@ def runnable():
     standbyEvent = Event()
 
     while True:
+        query = helena.take_command().lower()
+        print("In first")
+        if query == "" or query is None:
+            print("Reach the continue block")
+            continue
+
         print(standbyEvent.is_set())
         print(query)
         if standbyEvent.is_set():
+            print("In standby true")
             query = helena.take_command().lower()
-            if query is not None:
-                standbyEvent.clear()
-        else:
+            standbyEvent.clear()
+
+            task_controller(helena, query, standbyEvent)
+
+        elif not standbyEvent.is_set() and query == "elena":
+            print("In standby false")
             helena.sound_note()
             query = helena.take_command().lower()
 
-        if "what" and "time" in query:
-            helena.current_time()
-            standbyEvent.set()
-            thread = Thread(target=standby, args=[standbyEvent, ])
-            thread.start()
-        elif "date" and "what" or "which" and "today" in query:
-            helena.current_time()
-            standbyEvent.set()
-            thread = Thread(target=standby, args=[standbyEvent, ])
-            thread.start()
-        else:
-            helena.speak("I am allowed to perform this task")
-            helena.current_time()
-            standbyEvent.set()
-            thread = Thread(target=standby, args=[standbyEvent, ])
-            thread.start()
+            task_controller(helena, query, standbyEvent)

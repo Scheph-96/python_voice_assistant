@@ -3,20 +3,23 @@ import os
 import random
 import time
 from datetime import datetime
+from threading import Thread
 
 import psutil
 from pconst import const
 
 # Initialize constant variables which represent some specific paths
 const.OFFICE = ["Word", "Excel", "PowerPoint", "Project", "OneNote", "Publisher", "Visio", "Outlook"]
-const.USEFULLPATH = [os.environ['SYSTEMDRIVE']+"\\Program Files\\", os.environ['SYSTEMDRIVE']+"\\Program Files (x86)\\"]
+const.USEFULLPATH = [os.environ['SYSTEMDRIVE'] + "\\Program Files\\",
+                     os.environ['SYSTEMDRIVE'] + "\\Program Files (x86)\\"]
 const.DESKTOPPATH = os.path.normpath(os.path.expanduser("~/Desktop/")) + "\\"
 const.PICTURESPATH = os.path.normpath(os.path.expanduser("~/Pictures/")) + "\\"
 const.VIDEOSPATH = os.path.normpath(os.path.expanduser("~/Videos/")) + "\\"
 const.DOCUMENTSPATH = os.path.normpath(os.path.expanduser("~/Documents/")) + "\\"
 const.MUSICPATH = os.path.normpath(os.path.expanduser("~/Music/")) + "\\"
-const.STARTMENUPATH = os.environ['SYSTEMDRIVE']+"\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\"
-ALLPATH = [const.DESKTOPPATH, const.PICTURESPATH, const.VIDEOSPATH, const.DOCUMENTSPATH, const.MUSICPATH, const.STARTMENUPATH, const.USEFULLPATH]
+const.STARTMENUPATH = os.environ['SYSTEMDRIVE'] + "\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\"
+ALLPATH = [const.DESKTOPPATH, const.PICTURESPATH, const.VIDEOSPATH, const.DOCUMENTSPATH, const.MUSICPATH,
+           const.STARTMENUPATH, const.USEFULLPATH]
 filesFound = []
 
 
@@ -39,6 +42,11 @@ def screenshots_filename_generator():
 
 
 def standby(standbyEvent):
+    """
+        This function put the program in standby after a certain amount of time
+    :param standbyEvent: Threading event
+    """
+
     counter = 0
     while True:
         if not standbyEvent.isSet():
@@ -46,10 +54,29 @@ def standby(standbyEvent):
         time.sleep(1)
         counter += 1
         print("The timeout: ", counter)
-        if counter == 15:
+        if counter == 45:
             standbyEvent.clear()
             break
 
+
+def task_controller(helena, query, standbyEvent):
+    if "what" and "time" in query:
+        helena.current_time()
+        print("time gave")
+        standbyEvent.set()
+        thread = Thread(target=standby, args=[standbyEvent, ])
+        thread.start()
+    elif "which" and "day" in query:
+        helena.current_date()
+        print("date gave")
+        standbyEvent.set()
+        thread = Thread(target=standby, args=[standbyEvent, ])
+        thread.start()
+    else:
+        helena.speak("I am allowed to perform this task")
+        standbyEvent.set()
+        thread = Thread(target=standby, args=[standbyEvent, ])
+        thread.start()
 
 
 def os_mount_points():
@@ -77,7 +104,6 @@ def os_mount_points():
 
 
 def search_control(resultAvailable, speak):
-
     """
         Some kind of controller for the search engine
     :param resultAvailable: event
@@ -103,7 +129,6 @@ def search_control(resultAvailable, speak):
 
 
 def search_engine(filename, resultAvailable):
-
     """
         Search any file in the computer which match the file name gave in parameters
     :param resultAvailable: thread event
@@ -117,7 +142,7 @@ def search_engine(filename, resultAvailable):
     # If MSOffice is installed and if the request is on an office program
     for file in const.OFFICE:
         if file.lower() == filename:
-            path = const.STARTMENUPATH+file
+            path = const.STARTMENUPATH + file
             filesFound.append(path)
 
     # Loop over the specific paths declare early to find a file which the request
