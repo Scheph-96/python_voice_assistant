@@ -10,7 +10,6 @@ import wikipedia
 import os
 import pyautogui
 
-from wikipedia.wikipedia import search
 from pygame import mixer
 from .utilities import screenshots_filename_generator, search_control, search_engine
 
@@ -37,7 +36,7 @@ class Helena:
 
     # Presentation function
     def who_am_i(self):
-        identity = "I am Helena your voice assistant develop by Omar on Thursday September 30, 2021"
+        identity = "I am Helena, version 1.0,  your voice assistant develop by Omar on Thursday September 30, 2021"
         self.speak(identity)
 
     # Order listening function
@@ -55,7 +54,6 @@ class Helena:
         except Exception as e:
             print(e)
             return ""
-            # self.speak("I do not understand what you are saying")
 
     def sound_note(self):
         mixer.init()
@@ -92,13 +90,36 @@ class Helena:
         self.speak("Today's date is " + current_date)
 
     def wikipedia_search(self):
-        self.speak("what should i look for?")
-        query = self.take_command().lower()
-        self.speak("Searching for " + query)
-        wikipedia.set_lang("en")
-        time.sleep(0.3)
-        result = wikipedia.summary(query, sentences=2)
-        self.speak(result)
+        try:
+            self.speak("what should i look for?")
+            query = self.take_command().lower()
+            self.speak("Searching for " + query)
+            wikipedia.set_lang("en")
+            result = wikipedia.summary(query, sentences=5, auto_suggest=False, redirect=False)
+            self.speak(result)
+        except wikipedia.exceptions.WikipediaException as exception:
+            if type(exception) == wikipedia.exceptions.DisambiguationError:
+                while True:
+                    self.speak("Something went wrong with your request. Would you like to start over?")
+                    query = self.take_command().lower()
+                    if query not in ["yes", "no"]:
+                        self.speak("Please just say yes or no")
+                    else:
+                        if query == "yes":
+                            self.wikipedia_search()
+                        else:
+                            break
+            elif type(exception) == wikipedia.exceptions.HTTPTimeoutError:
+                while True:
+                    self.speak("Something went wrong with your request. Would you like to start over?")
+                    query = self.take_command().lower()
+                    if query not in ["yes", "no"]:
+                        self.speak("Please just say yes or no")
+                    else:
+                        if query == "yes":
+                            self.wikipedia_search()
+                        else:
+                            break
 
     def to_remember(self):
         self.speak("What should i remember?")
@@ -110,6 +131,13 @@ class Helena:
         self.speak("You told me to remember " + memory)
 
     def file_launcher(self):
+        """
+            Return a file or group of file matching your request
+        :return: String
+        :NB: This feature is not optimized, it may take some time
+        depending on the capacity of your computer, so search time will vary
+        between 1 seconds and 3 hours depending on the file searched
+        """
         self.speak("Which file would you like to launch?")
         to_launch = self.take_command().lower()
         resultAvailable = threading.Event()

@@ -72,6 +72,41 @@ def task_controller(helena, query, standbyEvent):
         standbyEvent.set()
         thread = Thread(target=standby, args=[standbyEvent, ])
         thread.start()
+    elif "who are you" or "what are you" or "introduce yourself" in query:
+        helena.who_am_i()
+        standbyEvent.set()
+        thread = Thread(target=standby, args=[standbyEvent, ])
+        thread.start()
+    elif "take" and "screenshot" in query:
+        helena.screenshot()
+        standbyEvent.set()
+        thread = Thread(target=standby, args=[standbyEvent, ])
+        thread.start()
+    elif "remember" or "keep in memory" in query:
+        helena.to_remember()
+        standbyEvent.set()
+        thread = Thread(target=standby, args=[standbyEvent, ])
+        thread.start()
+    elif "search" or "research" and "wikipedia" in query:
+        helena.wikipedia_search()
+        standbyEvent.set()
+        thread = Thread(target=standby, args=[standbyEvent, ])
+        thread.start()
+    elif "shutdown" in query:
+        helena.shutdown()
+        standbyEvent.set()
+        thread = Thread(target=standby, args=[standbyEvent, ])
+        thread.start()
+    elif "restart" in query:
+        helena.restart()
+        standbyEvent.set()
+        thread = Thread(target=standby, args=[standbyEvent, ])
+        thread.start()
+    elif "logout" in query:
+        helena.logout()
+        standbyEvent.set()
+        thread = Thread(target=standby, args=[standbyEvent, ])
+        thread.start()
     else:
         helena.speak("I am allowed to perform this task")
         standbyEvent.set()
