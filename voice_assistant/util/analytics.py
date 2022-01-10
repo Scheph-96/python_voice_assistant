@@ -1,4 +1,4 @@
-from threading import Thread, Event
+from threading import Event
 
 from .helena import Helena
 from .utilities import task_controller
@@ -23,7 +23,9 @@ def runnable():
         print(query)
         if standbyEvent.is_set():
             print("In standby true")
-            query = helena.take_command().lower()
+            # query = helena.take_command().lower()
+            print("The query in standby true: ", query)
+            print("The type of query in standby true: ", type(query))
             standbyEvent.clear()
 
             task_controller(helena, query, standbyEvent)
@@ -32,5 +34,7 @@ def runnable():
             print("In standby false")
             helena.sound_note()
             query = helena.take_command().lower()
+            print("The query in standby false: ", query)
+            print("The type of query in standby false: ", type(query))
 
             task_controller(helena, query, standbyEvent)

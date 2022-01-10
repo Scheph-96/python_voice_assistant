@@ -49,7 +49,7 @@ def standby(standbyEvent):
 
     counter = 0
     while True:
-        if not standbyEvent.isSet():
+        if not standbyEvent.is_set():
             break
         time.sleep(1)
         counter += 1
@@ -60,6 +60,10 @@ def standby(standbyEvent):
 
 
 def task_controller(helena, query, standbyEvent):
+
+    print('The query in task controller: ', query)
+    print('Standby Event in task controller: ', standbyEvent)
+
     if "what" and "time" in query:
         helena.current_time()
         print("time gave")
@@ -72,22 +76,22 @@ def task_controller(helena, query, standbyEvent):
         standbyEvent.set()
         thread = Thread(target=standby, args=[standbyEvent, ])
         thread.start()
-    elif "who are you" or "what are you" or "introduce yourself" in query:
+    elif "who are you" in query or "what are you" in query or "introduce yourself" in query:
         helena.who_am_i()
         standbyEvent.set()
         thread = Thread(target=standby, args=[standbyEvent, ])
         thread.start()
-    elif "take" and "screenshot" in query:
+    elif "take" and "screenshot" in query or "take" and "screenshots" in query:
         helena.screenshot()
         standbyEvent.set()
         thread = Thread(target=standby, args=[standbyEvent, ])
         thread.start()
-    elif "remember" or "keep in memory" in query:
+    elif "remember" in query or "keep in memory" in query:
         helena.to_remember()
         standbyEvent.set()
         thread = Thread(target=standby, args=[standbyEvent, ])
         thread.start()
-    elif "search" or "research" and "wikipedia" in query:
+    elif "search wikipedia" in query or "research wikipedia" in query:
         helena.wikipedia_search()
         standbyEvent.set()
         thread = Thread(target=standby, args=[standbyEvent, ])
@@ -108,7 +112,7 @@ def task_controller(helena, query, standbyEvent):
         thread = Thread(target=standby, args=[standbyEvent, ])
         thread.start()
     else:
-        helena.speak("I am allowed to perform this task")
+        helena.speak("I do not understand ", query)
         standbyEvent.set()
         thread = Thread(target=standby, args=[standbyEvent, ])
         thread.start()
@@ -197,7 +201,7 @@ def search_engine(filename, resultAvailable):
                             filepath = os.path.join(root, name)
                             filesFound.append(filepath)
 
-    # Loop over all partitions except os's partition to find a file which math the request
+    # Loop over all partitions except os's partition to find a file which match the request
     for path in os_mount_points():
         for root, directories, files in os.walk(path):
             for name in files:

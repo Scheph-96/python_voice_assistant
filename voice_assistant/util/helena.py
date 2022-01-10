@@ -1,4 +1,5 @@
 # import all necessary modules
+
 import threading
 import time
 from pathlib import Path
@@ -99,8 +100,8 @@ class Helena:
             self.speak(result)
         except wikipedia.exceptions.WikipediaException as exception:
             if type(exception) == wikipedia.exceptions.DisambiguationError:
+                self.speak("Something went wrong with your request. Would you like to start over?")
                 while True:
-                    self.speak("Something went wrong with your request. Would you like to start over?")
                     query = self.take_command().lower()
                     if query not in ["yes", "no"]:
                         self.speak("Please just say yes or no")
@@ -108,10 +109,11 @@ class Helena:
                         if query == "yes":
                             self.wikipedia_search()
                         else:
+                            self.speak("cancelled")
                             break
             elif type(exception) == wikipedia.exceptions.HTTPTimeoutError:
+                self.speak("Something went wrong with your request. Would you like to start over?")
                 while True:
-                    self.speak("Something went wrong with your request. Would you like to start over?")
                     query = self.take_command().lower()
                     if query not in ["yes", "no"]:
                         self.speak("Please just say yes or no")
@@ -119,16 +121,32 @@ class Helena:
                         if query == "yes":
                             self.wikipedia_search()
                         else:
+                            self.speak("cancelled")
                             break
 
     def to_remember(self):
         self.speak("What should i remember?")
         memory = self.take_command()
-        memoryCenter = open(os.fspath(Path(__file__).resolve().parent / "memoryCenter/memoryCenter"), "a")
-        memory += str("\n")
-        memoryCenter.write(memory)
-        memoryCenter.close()
-        self.speak("You told me to remember " + memory)
+        if memory != "":
+            memoryCenter = open(os.fspath(Path(__file__).resolve().parent / "memoryCenter/memoryCenter.txt"), "a")
+            memory += str("\n")
+            memoryCenter.write(memory)
+            memoryCenter.close()
+            self.speak("You told me to remember " + memory)
+        else:
+            self.speak("I don't get what you are saying !")
+            time.sleep(0.3)
+            self.speak("Would you like to try again ?")
+            while True:
+                query = self.take_command().lower()
+                if query not in ["yes", "no"]:
+                    self.speak("Please just say yes or no")
+                else:
+                    if query == "yes":
+                        self.to_remember()
+                    else:
+                        self.speak("cancelled")
+                        break
 
     def file_launcher(self):
         """
@@ -185,7 +203,3 @@ class Helena:
             self.speak("Process abort")
         else:
             self.speak("I do not understand. Process abort")
-
-
-if __name__ == "__module__":
-    pass
