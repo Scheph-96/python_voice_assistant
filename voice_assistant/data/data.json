@@ -100,10 +100,14 @@
     }
   },
   "appData": {
-    "language": ""
+    "1": {
+      "language": "english"
+    }
   },
   "userData": {
-    "username": "",
-    "memorize": []
+    "1": {
+      "username": "",
+      "memorize": []
+    }
   }
 }

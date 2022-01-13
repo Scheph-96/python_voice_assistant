@@ -2,8 +2,10 @@
 import os
 import random
 import time
+import re
 from datetime import datetime
 from threading import Thread
+from tinyDBModal import LocalStorage
 
 import psutil
 from pconst import const
@@ -64,50 +66,64 @@ def task_controller(helena, query, standbyEvent):
     print('The query in task controller: ', query)
     print('Standby Event in task controller: ', standbyEvent)
 
-    if "what" and "time" in query:
+    localStorage = LocalStorage()
+    patterns = localStorage.getPatterns()
+    code = ""
+
+    for pattern in patterns:
+        if re.search(pattern['pattern'], query):
+            code = pattern['code']
+            break
+
+    if code == "00h00m":
         helena.current_time()
         print("time gave")
         standbyEvent.set()
         thread = Thread(target=standby, args=[standbyEvent, ])
         thread.start()
-    elif "which" and "day" in query:
+    elif code == "00j00m":
         helena.current_date()
         print("date gave")
         standbyEvent.set()
         thread = Thread(target=standby, args=[standbyEvent, ])
         thread.start()
-    elif "who are you" in query or "what are you" in query or "introduce yourself" in query:
+    elif code == "00intro00":
         helena.who_am_i()
         standbyEvent.set()
         thread = Thread(target=standby, args=[standbyEvent, ])
         thread.start()
-    elif "take" and "screenshot" in query or "take" and "screenshots" in query:
+    elif code == "00shot00":
         helena.screenshot()
         standbyEvent.set()
         thread = Thread(target=standby, args=[standbyEvent, ])
         thread.start()
-    elif "remember" in query or "keep in memory" in query:
+    elif code == "00mind00":
         helena.to_remember()
         standbyEvent.set()
         thread = Thread(target=standby, args=[standbyEvent, ])
         thread.start()
-    elif "search wikipedia" in query or "research wikipedia" in query:
+    elif code == "00wikipedia00":
         helena.wikipedia_search()
         standbyEvent.set()
         thread = Thread(target=standby, args=[standbyEvent, ])
         thread.start()
-    elif "shutdown" in query:
+    elif code == "00shutdown00":
         helena.shutdown()
         standbyEvent.set()
         thread = Thread(target=standby, args=[standbyEvent, ])
         thread.start()
-    elif "restart" in query:
+    elif code == "00reboot00":
         helena.restart()
         standbyEvent.set()
         thread = Thread(target=standby, args=[standbyEvent, ])
         thread.start()
-    elif "logout" in query:
+    elif code == "00logout00":
         helena.logout()
+        standbyEvent.set()
+        thread = Thread(target=standby, args=[standbyEvent, ])
+        thread.start()
+    elif code == "00file00launcher00":
+        helena.file_launcher()
         standbyEvent.set()
         thread = Thread(target=standby, args=[standbyEvent, ])
         thread.start()

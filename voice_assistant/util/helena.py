@@ -5,7 +5,7 @@ import time
 from pathlib import Path
 
 import pyttsx3
-import datetime
+from datetime import datetime
 import speech_recognition as sr
 import wikipedia
 import os
@@ -37,7 +37,7 @@ class Helena:
 
     # Presentation function
     def who_am_i(self):
-        identity = "I am Helena, version 1.0,  your voice assistant develop by Omar on Thursday September 30, 2021"
+        identity = "I am Helena, version 1.0,  your voice assistant develop by Omar. I was created to make your life easier and to answer your needs regarding your computer. I am only a prototype that is not completely perfected but I will do my best to satisfy you "
         self.speak(identity)
 
     # Order listening function
@@ -71,7 +71,7 @@ class Helena:
 
     def greet(self):
 
-        hour = datetime.datetime.now().hour
+        hour = datetime.now().hour
 
         if 6 <= hour < 12:
             self.speak("Good morning")
@@ -82,13 +82,17 @@ class Helena:
 
     # Return current time
     def current_time(self):
-        current_time = datetime.datetime.now().strftime("%H:%M:%S")
+        current_time = datetime.now().strftime("%H:%M:%S")
         self.speak("It's " + current_time)
 
     # Return current date
     def current_date(self):
-        current_date = datetime.datetime.now().strftime("%A %d %B %Y")
+        current_date = datetime.now().strftime("%A %d %B %Y")
         self.speak("Today's date is " + current_date)
+
+    def current_day(self):
+        current_day = datetime.now().strftime("%A")
+        self.speak("Today is" + current_day)
 
     def wikipedia_search(self):
         try:
@@ -128,10 +132,8 @@ class Helena:
         self.speak("What should i remember?")
         memory = self.take_command()
         if memory != "":
-            memoryCenter = open(os.fspath(Path(__file__).resolve().parent / "memoryCenter/memoryCenter.txt"), "a")
-            memory += str("\n")
-            memoryCenter.write(memory)
-            memoryCenter.close()
+            memorize_pattern = {"memorize": memory, "date": datetime.now().strftime("%A %B %d, %Y"),
+                                "hour": datetime.now().strftime("%H%M%S")}
             self.speak("You told me to remember " + memory)
         else:
             self.speak("I don't get what you are saying !")
