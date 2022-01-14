@@ -13,9 +13,11 @@ import pyautogui
 
 from pygame import mixer
 from .utilities import screenshots_filename_generator, search_control, search_engine
+from tinyDBModal import LocalStorage
 
 
 class Helena:
+
     def __init__(self):
         self.engine = pyttsx3.init()
         self.engine.setProperty('rate', 150)
@@ -37,11 +39,19 @@ class Helena:
 
     # Presentation function
     def who_am_i(self):
+        """
+            Helena introducing function
+        :return:
+        """
         identity = "I am Helena, version 1.0,  your voice assistant develop by Omar. I was created to make your life easier and to answer your needs regarding your computer. I am only a prototype that is not completely perfected but I will do my best to satisfy you "
         self.speak(identity)
 
     # Order listening function
     def take_command(self):
+        """
+            This function take users voice input
+        :return: string
+        """
         print("speak")
         recognize = sr.Recognizer()
         with sr.Microphone() as source:
@@ -57,20 +67,40 @@ class Helena:
             return ""
 
     def sound_note(self):
+        """
+            This launch a sound note to say that helena is listening
+        :return:
+        """
         mixer.init()
         mixer.music.load(os.fspath(Path(__file__).resolve().parent / "sound/helena_sound.mp3"))
         mixer.music.play()
 
     # User data writing function
     def user_data(self):
-        self.speak("May i know your name?")
+        """
+            Set the user name
+        :return:
+        """
+        self.speak("May i know your name? Keep in mind that you can't change it later.")
         username = self.take_command().lower()
-        data = open(os.fspath(Path(__file__).resolve().parent / "memoryCenter/userData.txt"), "w")
-        data.write(username)
-        data.close()
+        self.speak("Your name is ")
+        self.speak(username)
+        self.speak("Are you sure you want to save it ?")
+        agreement = self.take_command().lower()
+        if agreement not in ["yes", "no"]:
+            self.speak("Just say yes or no")
+        else:
+            if agreement == "yes":
+                localStorage = LocalStorage()
+                localStorage.insertUsername(username)
+            else:
+                self.speak("action cancelled")
 
     def greet(self):
-
+        """
+            Greetings function
+        :return:
+        """
         hour = datetime.now().hour
 
         if 6 <= hour < 12:
@@ -80,17 +110,27 @@ class Helena:
         elif 18 <= hour < 6:
             self.speak("Good evening")
 
-    # Return current time
     def current_time(self):
+        """
+            Give the current time
+        :return:
+        """
         current_time = datetime.now().strftime("%H:%M:%S")
         self.speak("It's " + current_time)
 
-    # Return current date
     def current_date(self):
+        """
+            Give the current date
+        :return:
+        """
         current_date = datetime.now().strftime("%A %d %B %Y")
         self.speak("Today's date is " + current_date)
 
     def current_day(self):
+        """
+            Give the current day
+        :return:
+        """
         current_day = datetime.now().strftime("%A")
         self.speak("Today is" + current_day)
 
