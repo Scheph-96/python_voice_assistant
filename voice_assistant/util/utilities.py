@@ -1,16 +1,20 @@
 # Import all dependencies
+
 import os
 import random
 import time
 import re
 from datetime import datetime
-from threading import Thread
-from tinyDBModal import LocalStorage
+from threading import Thread, Event
+
+from voice_assistant.util.tinyDBModal import LocalStorage
+from voice_assistant.util.helena import Helena
 
 import psutil
 from pconst import const
 
 # Initialize constant variables which represent some specific paths
+
 const.OFFICE = ["Word", "Excel", "PowerPoint", "Project", "OneNote", "Publisher", "Visio", "Outlook"]
 const.USEFULLPATH = [os.environ['SYSTEMDRIVE'] + "\\Program Files\\",
                      os.environ['SYSTEMDRIVE'] + "\\Program Files (x86)\\"]
@@ -23,13 +27,13 @@ const.STARTMENUPATH = os.environ['SYSTEMDRIVE'] + "\\ProgramData\\Microsoft\\Win
 ALLPATH = [const.DESKTOPPATH, const.PICTURESPATH, const.VIDEOSPATH, const.DOCUMENTSPATH, const.MUSICPATH,
            const.STARTMENUPATH, const.USEFULLPATH]
 filesFound = []
+query = None
 
 
 def screenshots_filename_generator():
     """
-        Return a random filename for helena screenshots feature
-        Composed with the current date and time and a random number of four digit
-    :return: string
+        This function determinate a name for the screenshot
+    :return: string: Random filename for helena screenshots feature. Composed with the current date and time and a random number of four digit
     """
 
     randomize = ""
@@ -43,10 +47,48 @@ def screenshots_filename_generator():
     return filename
 
 
+def runnable():
+    """
+        This function deal with users input
+    :return:
+    """
+    global query
+
+    helena = Helena()
+    standbyEvent = Event()
+
+    while True:
+        query = helena.take_command().lower()
+        print("In first")
+        if query == "" or query is None:
+            print("Reach the continue block")
+            continue
+
+        print(standbyEvent.is_set())
+        print(query)
+        if standbyEvent.is_set():
+            print("In standby true")
+            # query = helena.take_command().lower()
+            print("The query in standby true: ", query)
+            print("The type of query in standby true: ", type(query))
+            standbyEvent.clear()
+
+            task_controller(helena, query, standbyEvent)
+
+        elif not standbyEvent.is_set() and query == "elena":
+            print("In standby false")
+            helena.sound_note()
+            query = helena.take_command().lower()
+            print("The query in standby false: ", query)
+            print("The type of query in standby false: ", type(query))
+
+            task_controller(helena, query, standbyEvent)
+
+
 def standby(standbyEvent):
     """
         This function put the program in standby after a certain amount of time
-    :param standbyEvent: Threading event
+    :param standbyEvent: Threading event: Event that sets up the stand by process
     """
 
     counter = 0
@@ -61,9 +103,16 @@ def standby(standbyEvent):
             break
 
 
-def task_controller(helena, query, standbyEvent):
+def task_controller(helena, userInput, standbyEvent):
+    """
+        This function analyze user's input and launch the appropriate response
+    :param helena: Helena instance: It contains all the potential answers that will be sent to the user.
+    :param userInput: string: User's input
+    :param standbyEvent: Threading event: Event that sets up the stand by process
+    :return:
+    """
 
-    print('The query in task controller: ', query)
+    print('The query in task controller: ', userInput)
     print('Standby Event in task controller: ', standbyEvent)
 
     localStorage = LocalStorage()
@@ -71,7 +120,7 @@ def task_controller(helena, query, standbyEvent):
     code = ""
 
     for pattern in patterns:
-        if re.search(pattern['pattern'], query):
+        if re.search(pattern['pattern'], userInput):
             code = pattern['code']
             break
 
@@ -128,7 +177,7 @@ def task_controller(helena, query, standbyEvent):
         thread = Thread(target=standby, args=[standbyEvent, ])
         thread.start()
     else:
-        helena.speak("I do not understand ", query)
+        helena.speak("I do not understand "+userInput)
         standbyEvent.set()
         thread = Thread(target=standby, args=[standbyEvent, ])
         thread.start()
@@ -136,8 +185,8 @@ def task_controller(helena, query, standbyEvent):
 
 def os_mount_points():
     """
-        Return the computer drives
-    :return: list
+        This function allows to recover the computer partitions except the operating system partition
+    :return: list: List of computer's drives
     """
 
     # Get os partitions
@@ -146,10 +195,10 @@ def os_mount_points():
     for partition in partitions:
         try:
             # Get the os drive
-            systemDriveFromOS = os.environ['SYSTEMDRIVE'].split("\\")
-            systemDriveFromPython = partition.device.split("\\")
+            OSDrive = os.environ['SYSTEMDRIVE'].split("\\")
+            systemDrives = partition.device.split("\\")
             # Match the os drive with all partition and exclude it
-            if systemDriveFromOS[0] != systemDriveFromPython[0]:
+            if OSDrive[0] != systemDrives[0]:
                 mountPoints.append(partition.mountpoint)
         except PermissionError:
             # this can be caught due to the disk that
@@ -160,9 +209,10 @@ def os_mount_points():
 
 def search_control(resultAvailable, speak):
     """
-        Some kind of controller for the search engine
-    :param resultAvailable: event
-    :param speak: speaker function
+        This function is some kind of controller for the search engine
+    :param resultAvailable: Threading event: Event that tracks search time
+    :param speak: Helena's speak function: Return a voice note of the text gave as parameter
+    :return:
     """
 
     global filesFound
@@ -171,7 +221,7 @@ def search_control(resultAvailable, speak):
         speak("Searching! Please wait")
 
     # All files matching the request are put in ine filesFound list.
-    # If only one file is find it will be launched else return how many files are found
+    # If only one file is find it will be launched and if it doesn't it will return how many files are found
     # And if there is no file matching the request a message will be returned
     if len(filesFound) != 0:
         if len(filesFound) == 1:
@@ -185,10 +235,10 @@ def search_control(resultAvailable, speak):
 
 def search_engine(filename, resultAvailable):
     """
-        Search any file in the computer which match the file name gave in parameters
-    :param resultAvailable: thread event
-    :param filename: string
-    :return: string
+        Search any file in the computer that match the file name gave in parameters
+    :param resultAvailable: Threading event: Event that tracks search time
+    :param filename: string: The name of the file to search
+    :return:
     """
 
     global filesFound

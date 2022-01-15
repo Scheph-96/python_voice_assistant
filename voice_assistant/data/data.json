@@ -101,7 +101,8 @@
   },
   "appData": {
     "1": {
-      "language": "english"
+      "language": "english",
+      "first_launch": true
     }
   },
   "userData": {

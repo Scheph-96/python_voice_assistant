@@ -12,45 +12,63 @@ import os
 import pyautogui
 
 from pygame import mixer
-from .utilities import screenshots_filename_generator, search_control, search_engine
-from tinyDBModal import LocalStorage
+if __name__ == "__main__":
+    from voice_assistant.util.utilities import screenshots_filename_generator, search_control, search_engine
+from voice_assistant.util.tinyDBModal import LocalStorage
 
 
 class Helena:
+    """
+        This is Helena's class describing all her features
+
+        :attributes: None
+    """
 
     def __init__(self):
-        self.engine = pyttsx3.init()
-        self.engine.setProperty('rate', 150)
+        """
+            The constructor for Helena Class
+        """
+        self.__engine = pyttsx3.init()
+        self.__engine.setProperty('rate', 150)
 
-    # Initialize the voice
-    # If you don't have this one, it will select the default voice on your computer
     @staticmethod
     def change_voice(engine):
+        """
+            This function changes the voice of Helena according to the voice properties of the OS.
+        :param engine: pyttsx3 instance: Helena's voice engine
+        :return:
+        """
         for voice in engine.getProperty('voices'):
+            # If you don't have this one it will select the default voice of your os
             if voice.name == "Microsoft Zira Desktop - English (United States)":
                 engine.setProperty('voice', voice.id)
                 break
 
-    # Speaking function
-    def speak(self, audio):
-        self.change_voice(self.engine)
-        self.engine.say(audio)
-        self.engine.runAndWait()
+    def speak(self, text):
+        """
+            This function return a voice note of the text gave as parameter
+        :param text: string: The text which helena's voice engine will return as voice note
+        :return:
+        """
+        self.change_voice(self.__engine)
+        self.__engine.say(text)
+        self.__engine.runAndWait()
 
-    # Presentation function
     def who_am_i(self):
         """
             Helena introducing function
         :return:
         """
-        identity = "I am Helena, version 1.0,  your voice assistant develop by Omar. I was created to make your life easier and to answer your needs regarding your computer. I am only a prototype that is not completely perfected but I will do my best to satisfy you "
+        identity = "I am Helena, version 1.0,  your voice assistant develop by Omar. I was created to make your life" \
+                   " easier and to answer your needs regarding your computer. I am only a prototype that is not completely" \
+                   " perfected but I will do my best to satisfy you "
         self.speak(identity)
 
     # Order listening function
     def take_command(self):
         """
-            This function take users voice input
-        :return: string
+            This function convert user's voice input in text
+        :return: string: User voice input as text
         """
         print("speak")
         recognize = sr.Recognizer()
@@ -68,14 +86,13 @@ class Helena:
 
     def sound_note(self):
         """
-            This launch a sound note to say that helena is listening
+            This function launch a sound note which say that helena is listening
         :return:
         """
         mixer.init()
         mixer.music.load(os.fspath(Path(__file__).resolve().parent / "sound/helena_sound.mp3"))
         mixer.music.play()
 
-    # User data writing function
     def user_data(self):
         """
             Set the user name
@@ -112,7 +129,7 @@ class Helena:
 
     def current_time(self):
         """
-            Give the current time
+            This function give the current time
         :return:
         """
         current_time = datetime.now().strftime("%H:%M:%S")
@@ -120,7 +137,7 @@ class Helena:
 
     def current_date(self):
         """
-            Give the current date
+            This function give the current date
         :return:
         """
         current_date = datetime.now().strftime("%A %d %B %Y")
@@ -128,19 +145,23 @@ class Helena:
 
     def current_day(self):
         """
-            Give the current day
+            This function give the current day
         :return:
         """
         current_day = datetime.now().strftime("%A")
         self.speak("Today is" + current_day)
 
     def wikipedia_search(self):
+        """
+            This function makes a research on wikipedia and return the first 3 sentences.
+        :return:
+        """
         try:
             self.speak("what should i look for?")
             query = self.take_command().lower()
             self.speak("Searching for " + query)
             wikipedia.set_lang("en")
-            result = wikipedia.summary(query, sentences=5, auto_suggest=False, redirect=False)
+            result = wikipedia.summary(query, sentences=3, auto_suggest=False, redirect=False)
             self.speak(result)
         except wikipedia.exceptions.WikipediaException as exception:
             if type(exception) == wikipedia.exceptions.DisambiguationError:
@@ -169,12 +190,18 @@ class Helena:
                             break
 
     def to_remember(self):
+        """
+            This function allow helena to keep in mind somethings for the user
+        :return:
+        """
         self.speak("What should i remember?")
         memory = self.take_command()
         if memory != "":
-            memorize_pattern = {"memorize": memory, "date": datetime.now().strftime("%A %B %d, %Y"),
+            memorize_pattern = {"memory": memory, "date": datetime.now().strftime("%A %B %d, %Y"),
                                 "hour": datetime.now().strftime("%H%M%S")}
-            self.speak("You told me to remember " + memory)
+            localStorage = LocalStorage()
+            localStorage.insertMemorize(memorize_pattern)
+            self.speak("You told me to remember " + memorize_pattern["memory"])
         else:
             self.speak("I don't get what you are saying !")
             time.sleep(0.3)
@@ -192,11 +219,10 @@ class Helena:
 
     def file_launcher(self):
         """
-            Return a file or group of file matching your request
-        :return: String
-        :NB: This feature is not optimized, it may take some time
-        depending on the capacity of your computer, so search time will vary
-        between 1 seconds and 3 hours depending on the file searched
+            This function looks for a file or group of file matching your request
+        :return:
+        :NB: This feature is not optimized, it may take some time depending on your computer capacities,
+         so search time will vary between 1 second and 3 hours depending on the file searched
         """
         self.speak("Which file would you like to launch?")
         to_launch = self.take_command().lower()
@@ -206,6 +232,10 @@ class Helena:
         search_control(resultAvailable, self.speak)
 
     def screenshot(self):
+        """
+            This function takes a screenshot
+        :return:
+        """
         img = pyautogui.screenshot()
         filename = screenshots_filename_generator()
         folder_path = os.path.normpath(os.path.expanduser("~/Pictures/")) + "\\"
@@ -214,6 +244,10 @@ class Helena:
         self.speak("screenshot took successfully")
 
     def shutdown(self):
+        """
+            This function shutdown your computer
+        :return:
+        """
         self.speak("Do you really want to shutdown?")
         answer = self.take_command().lower()
         if answer == "yes":
@@ -225,6 +259,10 @@ class Helena:
             self.speak("I do not understand. Process abort")
 
     def restart(self):
+        """
+            This function reboot your computer
+        :return:
+        """
         self.speak("Do you really want to restart?")
         answer = self.take_command().lower()
         if answer == "yes":
@@ -236,6 +274,10 @@ class Helena:
             self.speak("I do not understand. Process abort")
 
     def logout(self):
+        """
+            This function logout from your current windows session
+        :return:
+        """
         self.speak("Do you really want to logout?")
         answer = self.take_command().lower()
         if answer == "yes":

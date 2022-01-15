@@ -1,4 +1,4 @@
-from util.analytics import runnable
+from voice_assistant.util.utilities import runnable
 
 
 if __name__ == "__main__":
