@@ -57,6 +57,9 @@ def runnable():
     helena = Helena()
     standbyEvent = Event()
 
+    localStorage = LocalStorage()
+    patterns = localStorage.getPatterns()
+
     while True:
         query = helena.take_command().lower()
         print("In first")
@@ -73,7 +76,7 @@ def runnable():
             print("The type of query in standby true: ", type(query))
             standbyEvent.clear()
 
-            task_controller(helena, query, standbyEvent)
+            task_controller(helena, query, standbyEvent, patterns)
 
         elif not standbyEvent.is_set() and query == "elena":
             print("In standby false")
@@ -82,7 +85,7 @@ def runnable():
             print("The query in standby false: ", query)
             print("The type of query in standby false: ", type(query))
 
-            task_controller(helena, query, standbyEvent)
+            task_controller(helena, query, standbyEvent, patterns)
 
 
 def standby(standbyEvent):
@@ -103,9 +106,10 @@ def standby(standbyEvent):
             break
 
 
-def task_controller(helena, userInput, standbyEvent):
+def task_controller(helena, userInput, standbyEvent, patterns):
     """
         This function analyze user's input and launch the appropriate response
+    :param patterns: list: Regex pattern
     :param helena: Helena instance: It contains all the potential answers that will be sent to the user.
     :param userInput: string: User's input
     :param standbyEvent: Threading event: Event that sets up the stand by process
@@ -114,9 +118,6 @@ def task_controller(helena, userInput, standbyEvent):
 
     print('The query in task controller: ', userInput)
     print('Standby Event in task controller: ', standbyEvent)
-
-    localStorage = LocalStorage()
-    patterns = localStorage.getPatterns()
     code = ""
 
     for pattern in patterns:

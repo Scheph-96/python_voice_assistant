@@ -16,7 +16,7 @@ class LocalStorage(object):
         """
             The constructor for localStorage Class
         """
-        self.__database = TinyDB(os.fspath(Path(__file__).resolve().parent.parent / "data/data.json"), sort_keys=True, indent=4, separators=(',', ': '))
+        self.__database = TinyDB(os.fspath(Path(__file__).resolve().parent.parent / "data/data.json"), sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
 
     def findData(self, tableName, fieldName, value):
         """

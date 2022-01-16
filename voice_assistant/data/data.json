@@ -1,114 +1,120 @@
 {
-  "appUtilities": {
-    "1": {
-      "language": "english",
-      "patterns": [
-        {
-          "pattern": "(tell me|what).*time.*(it is|is it)?",
-          "code": "00h00m"
-        },
-        {
-          "pattern": "what.*(today|date).*(today|date)",
-          "code": "00j00m"
-        },
-        {
-          "pattern": "what day.*",
-          "code": "00"
-        },
-        {
-          "pattern": "(who|what|introduce).*(yourself|you)",
-          "code": "00intro00"
-        },
-        {
-          "pattern": "take.*(screenshot|screenshots)",
-          "code": "00shot00"
-        },
-        {
-          "pattern": "(bear|keep).*mind",
-          "code": "00mind00"
-        },
-        {
-          "pattern": "(search|research)?.*wikipedia.*(search|research)?",
-          "code": "00wikipedia00"
-        },
-        {
-          "pattern": "shutdown.*(computer)?",
-          "code": "00shutdown00"
-        },
-        {
-          "pattern": "(restart|reboot).*(computer)?",
-          "code": "00reboot00"
-        },
-        {
-          "pattern": "logout.*(session)?",
-          "code": "00logout00"
-        },
-        {
-          "pattern": "(launch|start).*(file)?",
-          "code": "00file00launcher00"
+    "appData": {
+        "1": {
+            "first_launch": true,
+            "language": "english"
         }
-      ]
     },
-    "2": {
-      "language": "french",
-      "patterns": [
-        {
-          "pattern": "(quelle|il).*heure",
-          "code": "00h00m"
+    "appUtilities": {
+        "1": {
+            "language": "english",
+            "patterns": [
+                {
+                    "code": "00h00m",
+                    "pattern": "(tell me|what).*time.*(it is|is it)?"
+                },
+                {
+                    "code": "00j00m",
+                    "pattern": "what.*(today|date).*(today|date)"
+                },
+                {
+                    "code": "00",
+                    "pattern": "(which|what).*day.*"
+                },
+                {
+                    "code": "00intro00",
+                    "pattern": "(who|what|introduce).*(yourself|you)"
+                },
+                {
+                    "code": "00shot00",
+                    "pattern": "take.*(screenshot|screenshots)"
+                },
+                {
+                    "code": "00mind00",
+                    "pattern": "(bear|keep).*mind"
+                },
+                {
+                    "code": "00wikipedia00",
+                    "pattern": "(search|research)?.*wikipedia.*(search|research)?"
+                },
+                {
+                    "code": "00shutdown00",
+                    "pattern": "shutdown.*(computer)?"
+                },
+                {
+                    "code": "00reboot00",
+                    "pattern": "(restart|reboot).*(computer)?"
+                },
+                {
+                    "code": "00logout00",
+                    "pattern": "logout.*(session)?"
+                },
+                {
+                    "code": "00file00launcher00",
+                    "pattern": "(launch|start).*(file)?"
+                }
+            ]
         },
-        {
-          "pattern": "quelle.*date",
-          "code": "00j00m"
-        },
-        {
-          "pattern": "quel.*jour",
-          "code": "00"
-        },
-        {
-          "pattern": "(qu'est ce que|comment|qui).*(es|appelles)",
-          "code": "00intro00"
-        },
-        {
-          "pattern": "prend.*(capture d'écran|screenshot)",
-          "code": "00shot00"
-        },
-        {
-          "pattern": "(rappel|rappelle|souviens|rappeler|souvenir).*(toi)?",
-          "code": "00mind00"
-        },
-        {
-          "pattern": "(recherche|cherche|rechercher|chercher).*wikipedia",
-          "code": "00wikipedia00"
-        },
-        {
-          "pattern": "(arrête|arrêter).*ordinateur",
-          "code": "00shutdown00"
-        },
-        {
-          "pattern": "(redémarre|redémarrer).*ordinateur",
-          "code": "00reboot00"
-        },
-        {
-          "pattern": "déconnecte|déconnecter.*session",
-          "code": "00logout00"
-        },
-        {
-          "pattern": "(lance|démarre).*fichier.*",
-          "code": "00file00launcher00"
+        "2": {
+            "language": "french",
+            "patterns": [
+                {
+                    "code": "00h00m",
+                    "pattern": "(quelle|il).*heure"
+                },
+                {
+                    "code": "00j00m",
+                    "pattern": "quelle.*date"
+                },
+                {
+                    "code": "00",
+                    "pattern": "quel.*jour"
+                },
+                {
+                    "code": "00intro00",
+                    "pattern": "(qu'est ce que|comment|qui).*(es|appelles)"
+                },
+                {
+                    "code": "00shot00",
+                    "pattern": "prend.*(capture d'écran|screenshot)"
+                },
+                {
+                    "code": "00mind00",
+                    "pattern": "(rappel|rappelle|souviens|rappeler|souvenir).*(toi)?"
+                },
+                {
+                    "code": "00wikipedia00",
+                    "pattern": "(recherche|cherche|rechercher|chercher).*wikipedia"
+                },
+                {
+                    "code": "00shutdown00",
+                    "pattern": "(arrête|arrêter).*ordinateur"
+                },
+                {
+                    "code": "00reboot00",
+                    "pattern": "(redémarre|redémarrer).*ordinateur"
+                },
+                {
+                    "code": "00logout00",
+                    "pattern": "(déconnecte|déconnecter).*session"
+                },
+                {
+                    "code": "00file00launcher00",
+                    "pattern": "(lance|démarre).*fichier.*"
+                }
+            ]
         }
-      ]
+    },
+    "userData": {
+        "1": {
+            "memorize": [
+                {
+                    "date": "Saturday January 15, 2022",
+                    "hour": "220117",
+                    "memory": "hello one"
+                }
+            ],
+            "username": ""
+        }
     }
-  },
-  "appData": {
-    "1": {
-      "language": "english",
-      "first_launch": true
-    }
-  },
-  "userData": {
-    "1": {
-      "username": "",
-      "memorize": []
-    }
-  }
 }

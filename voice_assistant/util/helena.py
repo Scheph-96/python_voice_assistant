@@ -10,10 +10,9 @@ import speech_recognition as sr
 import wikipedia
 import os
 import pyautogui
+import voice_assistant.util.utilities
 
 from pygame import mixer
-if __name__ == "__main__":
-    from voice_assistant.util.utilities import screenshots_filename_generator, search_control, search_engine
 from voice_assistant.util.tinyDBModal import LocalStorage
 
 
@@ -30,6 +29,7 @@ class Helena:
         """
         self.__engine = pyttsx3.init()
         self.__engine.setProperty('rate', 150)
+        self.__localStorage = LocalStorage()
 
     @staticmethod
     def change_voice(engine):
@@ -156,15 +156,36 @@ class Helena:
             This function makes a research on wikipedia and return the first 3 sentences.
         :return:
         """
-        try:
-            self.speak("what should i look for?")
-            query = self.take_command().lower()
-            self.speak("Searching for " + query)
-            wikipedia.set_lang("en")
-            result = wikipedia.summary(query, sentences=3, auto_suggest=False, redirect=False)
-            self.speak(result)
-        except wikipedia.exceptions.WikipediaException as exception:
-            if type(exception) == wikipedia.exceptions.DisambiguationError:
+        self.speak("what should i look for?")
+        query = self.take_command().lower()
+        if query == "":
+            self.speak("I don't get what you are saying !")
+            time.sleep(0.3)
+            self.speak("Would you like to try again ?")
+            while True:
+                answer = self.take_command().lower()
+                if answer not in ["yes", "no"]:
+                    self.speak("Please just say yes or no")
+                else:
+                    if answer == "yes":
+                        self.wikipedia_search()
+                    else:
+                        self.speak("cancelled")
+                        break
+        else:
+            try:
+                self.speak("Searching for " + query)
+                appLanguage = self.__localStorage.getFieldValue("appData", "language")
+
+                if appLanguage == "english":
+                    wikipedia.set_lang("en")
+                elif appLanguage == "french":
+                    wikipedia.set_lang("fr")
+
+                result = wikipedia.summary(query, sentences=3, auto_suggest=False, redirect=False)
+                self.speak(result)
+            except wikipedia.exceptions.WikipediaException as exception:
+                # if type(exception) == wikipedia.exceptions.DisambiguationError:
                 self.speak("Something went wrong with your request. Would you like to start over?")
                 while True:
                     query = self.take_command().lower()
@@ -176,18 +197,18 @@ class Helena:
                         else:
                             self.speak("cancelled")
                             break
-            elif type(exception) == wikipedia.exceptions.HTTPTimeoutError:
-                self.speak("Something went wrong with your request. Would you like to start over?")
-                while True:
-                    query = self.take_command().lower()
-                    if query not in ["yes", "no"]:
-                        self.speak("Please just say yes or no")
-                    else:
-                        if query == "yes":
-                            self.wikipedia_search()
-                        else:
-                            self.speak("cancelled")
-                            break
+                # elif type(exception) == wikipedia.exceptions.HTTPTimeoutError:
+                #     self.speak("Something went wrong with your request. Would you like to start over?")
+                #     while True:
+                #         query = self.take_command().lower()
+                #         if query not in ["yes", "no"]:
+                #             self.speak("Please just say yes or no")
+                #         else:
+                #             if query == "yes":
+                #                 self.wikipedia_search()
+                #             else:
+                #                 self.speak("cancelled")
+                #                 break
 
     def to_remember(self):
         """
@@ -198,9 +219,8 @@ class Helena:
         memory = self.take_command()
         if memory != "":
             memorize_pattern = {"memory": memory, "date": datetime.now().strftime("%A %B %d, %Y"),
-                                "hour": datetime.now().strftime("%H%M%S")}
-            localStorage = LocalStorage()
-            localStorage.insertMemorize(memorize_pattern)
+                                "hour": datetime.now().strftime("%H:%M:%S")}
+            self.__localStorage.insertMemorize(memorize_pattern)
             self.speak("You told me to remember " + memorize_pattern["memory"])
         else:
             self.speak("I don't get what you are saying !")
@@ -227,9 +247,9 @@ class Helena:
         self.speak("Which file would you like to launch?")
         to_launch = self.take_command().lower()
         resultAvailable = threading.Event()
-        thread = threading.Thread(target=search_engine, args=[to_launch, resultAvailable, ])
+        thread = threading.Thread(target=voice_assistant.util.utilities.search_engine, args=[to_launch, resultAvailable, ])
         thread.start()
-        search_control(resultAvailable, self.speak)
+        voice_assistant.util.utilities.search_control(resultAvailable, self.speak)
 
     def screenshot(self):
         """
@@ -237,7 +257,7 @@ class Helena:
         :return:
         """
         img = pyautogui.screenshot()
-        filename = screenshots_filename_generator()
+        filename = voice_assistant.util.utilities.screenshots_filename_generator()
         folder_path = os.path.normpath(os.path.expanduser("~/Pictures/")) + "\\"
         file_path = folder_path + filename
         img.save(file_path)
