@@ -30,6 +30,10 @@
                     "pattern": "take.*(screenshot|screenshots)"
                 },
                 {
+                    "code": "00binary00",
+                    "pattern": "(convert|turn).*binary"
+                },
+                {
                     "code": "00mind00",
                     "pattern": "(bear|keep).*mind"
                 },
