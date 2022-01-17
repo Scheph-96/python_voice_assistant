@@ -263,6 +263,24 @@ class Helena:
         img.save(file_path)
         self.speak("screenshot took successfully")
 
+    def string_to_binary(self, string):
+        """
+            This function convert string to binary
+        :param string: string: The string that will be convert to binary
+        :return:
+        """
+        asciiList, binaryList, result = [], [], ""
+
+        for char in string:
+            asciiList.append(ord(char))
+        for asciiCode in asciiList:
+            if int(bin(asciiCode)[2:]) != 100000:
+                binaryList.append(str(int(bin(asciiCode)[2:])))
+
+        result = string+" in binary is "+"".join(binaryList)
+
+        self.speak(result)
+
     def shutdown(self):
         """
             This function shutdown your computer

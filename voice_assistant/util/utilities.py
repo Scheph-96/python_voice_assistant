@@ -137,6 +137,12 @@ def task_controller(helena, userInput, standbyEvent, patterns):
         standbyEvent.set()
         thread = Thread(target=standby, args=[standbyEvent, ])
         thread.start()
+    elif code == "00":
+        helena.current_day()
+        print("day gave")
+        standbyEvent.set()
+        thread = Thread(target=standby, args=[standbyEvent, ])
+        thread.start()
     elif code == "00intro00":
         helena.who_am_i()
         standbyEvent.set()
@@ -147,6 +153,11 @@ def task_controller(helena, userInput, standbyEvent, patterns):
         standbyEvent.set()
         thread = Thread(target=standby, args=[standbyEvent, ])
         thread.start()
+    # elif code == "00binary00":
+    #     helena.screenshot()
+    #     standbyEvent.set()
+    #     thread = Thread(target=standby, args=[standbyEvent, ])
+    #     thread.start()
     elif code == "00mind00":
         helena.to_remember()
         standbyEvent.set()
