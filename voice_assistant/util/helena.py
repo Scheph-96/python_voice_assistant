@@ -28,7 +28,7 @@ class Helena:
             The constructor for Helena Class
         """
         self.__engine = pyttsx3.init()
-        self.__engine.setProperty('rate', 150)
+        self.__engine.setProperty('rate', 120)
         self.__localStorage = LocalStorage()
 
     @staticmethod
@@ -158,6 +158,7 @@ class Helena:
         """
         self.speak("what should i look for?")
         query = self.take_command().lower()
+        print("The query in wikipedia function: ", query)
         if query == "":
             self.speak("I don't get what you are saying !")
             time.sleep(0.3)
@@ -169,6 +170,7 @@ class Helena:
                 else:
                     if answer == "yes":
                         self.wikipedia_search()
+                        break
                     else:
                         self.speak("cancelled")
                         break
@@ -182,9 +184,11 @@ class Helena:
                 elif appLanguage == "french":
                     wikipedia.set_lang("fr")
 
-                result = wikipedia.summary(query, sentences=3, auto_suggest=False, redirect=False)
+                result = wikipedia.summary(query, sentences=5, auto_suggest=False, redirect=True)
+                print(result)
                 self.speak(result)
             except wikipedia.exceptions.WikipediaException as exception:
+                print(exception)
                 # if type(exception) == wikipedia.exceptions.DisambiguationError:
                 self.speak("Something went wrong with your request. Would you like to start over?")
                 while True:
@@ -194,6 +198,7 @@ class Helena:
                     else:
                         if query == "yes":
                             self.wikipedia_search()
+                            break
                         else:
                             self.speak("cancelled")
                             break
@@ -220,7 +225,7 @@ class Helena:
         if memory != "":
             memorize_pattern = {"memory": memory, "date": datetime.now().strftime("%A %B %d, %Y"),
                                 "hour": datetime.now().strftime("%H:%M:%S")}
-            self.__localStorage.insertMemorize(memorize_pattern)
+            self.__localStorage.insertMemories(memorize_pattern)
             self.speak("You told me to remember " + memorize_pattern["memory"])
         else:
             self.speak("I don't get what you are saying !")
@@ -233,6 +238,7 @@ class Helena:
                 else:
                     if query == "yes":
                         self.to_remember()
+                        break
                     else:
                         self.speak("cancelled")
                         break
@@ -263,23 +269,41 @@ class Helena:
         img.save(file_path)
         self.speak("screenshot took successfully")
 
-    def string_to_binary(self, string):
+    def string_to_binary(self):
         """
             This function convert string to binary
-        :param string: string: The string that will be convert to binary
         :return:
         """
         asciiList, binaryList, result = [], [], ""
 
-        for char in string:
-            asciiList.append(ord(char))
-        for asciiCode in asciiList:
-            if int(bin(asciiCode)[2:]) != 100000:
-                binaryList.append(str(int(bin(asciiCode)[2:])))
+        self.speak("Which sentence or word would you like to convert to binary ?")
+        string = self.take_command().lower()
 
-        result = string+" in binary is "+"".join(binaryList)
+        if string == "":
+            self.speak("I don't get what you are saying !")
+            time.sleep(0.3)
+            self.speak("Would you like to try again ?")
+            while True:
+                answer = self.take_command().lower()
+                if answer not in ["yes", "no"]:
+                    self.speak("Please just say yes or no")
+                else:
+                    if answer == "yes":
+                        self.string_to_binary()
+                        break
+                    else:
+                        self.speak("cancelled")
+                        break
+        else:
+            for char in string:
+                asciiList.append(ord(char))
+            for asciiCode in asciiList:
+                if int(bin(asciiCode)[2:]) != 100000:
+                    binaryList.append(str(int(bin(asciiCode)[2:])))
 
-        self.speak(result)
+            result = string+" in binary is "+"".join(binaryList)
+            print(result)
+            self.speak(result)
 
     def shutdown(self):
         """

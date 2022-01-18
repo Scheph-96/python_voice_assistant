@@ -72,7 +72,7 @@ class LocalStorage(object):
 
         return my_query.get("username")
 
-    def insertMemorize(self, memory):
+    def insertMemories(self, memory):
         """
             This function inserts new information to remember
         :param memory: dictionary: Memories pattern

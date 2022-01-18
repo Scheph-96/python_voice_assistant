@@ -87,6 +87,10 @@
                     "pattern": "(rappel|rappelle|souviens|rappeler|souvenir).*(toi)?"
                 },
                 {
+                    "code": "00binary00",
+                    "pattern": "(converti|convertis|convertit).*binaire"
+                },
+                {
                     "code": "00wikipedia00",
                     "pattern": "(recherche|cherche|rechercher|chercher).*wikipedia"
                 },
@@ -113,9 +117,9 @@
         "1": {
             "memorize": [
                 {
-                    "date": "Saturday January 15, 2022",
-                    "hour": "220117",
-                    "memory": "hello one"
+                    "date": "Monday January 17, 2022",
+                    "hour": "23:53:32",
+                    "memory": "call Mom"
                 }
             ],
             "username": ""

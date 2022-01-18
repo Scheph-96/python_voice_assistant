@@ -153,11 +153,11 @@ def task_controller(helena, userInput, standbyEvent, patterns):
         standbyEvent.set()
         thread = Thread(target=standby, args=[standbyEvent, ])
         thread.start()
-    # elif code == "00binary00":
-    #     helena.screenshot()
-    #     standbyEvent.set()
-    #     thread = Thread(target=standby, args=[standbyEvent, ])
-    #     thread.start()
+    elif code == "00binary00":
+        helena.string_to_binary()
+        standbyEvent.set()
+        thread = Thread(target=standby, args=[standbyEvent, ])
+        thread.start()
     elif code == "00mind00":
         helena.to_remember()
         standbyEvent.set()
