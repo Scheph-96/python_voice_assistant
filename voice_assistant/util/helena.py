@@ -2,7 +2,10 @@
 
 import threading
 import time
+import re
+import webbrowser
 from pathlib import Path
+from subprocess import check_output
 
 import pyttsx3
 from datetime import datetime
@@ -305,47 +308,67 @@ class Helena:
             print(result)
             self.speak(result)
 
-    def shutdown(self):
-        """
-            This function shutdown your computer
-        :return:
-        """
-        self.speak("Do you really want to shutdown?")
+    def launch_source_code_page(self):
+        self.speak("Would you like to see the web page or directly download the source code?")
         answer = self.take_command().lower()
-        if answer == "yes":
-            self.speak("Shutting down the computer")
-            os.system("shutdown /s /t 1")
-        elif answer == "no":
-            self.speak("Process abort")
-        else:
-            self.speak("I do not understand. Process abort")
 
-    def restart(self):
-        """
-            This function reboot your computer
-        :return:
-        """
-        self.speak("Do you really want to restart?")
-        answer = self.take_command().lower()
-        if answer == "yes":
-            self.speak("Reboot")
-            os.system("shutdown /r /t 1")
-        elif answer == "no":
-            self.speak("Process abort")
-        else:
-            self.speak("I do not understand. Process abort")
+        code = ""
+        localStorage = LocalStorage()
+        patterns = localStorage.getPatterns()
+        for pattern in patterns:
+            if re.search(pattern['pattern'], answer):
+                code = pattern['code']
+                break
 
-    def logout(self):
-        """
-            This function logout from your current windows session
-        :return:
-        """
-        self.speak("Do you really want to logout?")
-        answer = self.take_command().lower()
-        if answer == "yes":
-            self.speak("Logout")
-            os.system("shutdown -l")
-        elif answer == "no":
-            self.speak("Process abort")
-        else:
-            self.speak("I do not understand. Process abort")
+        # if code == "00download00source00code00":
+        #     cmd = '!git clone https://github.com/Scheph-96/python_voice_assistant_with_PySide6.git '+voice_assistant.util.utilities.DOWNLOADSPATH
+        #     check_output(cmd, shell=True).decode()
+        # el
+        if code == "00open00source00code00":
+            webbrowser.open("https://github.com/Scheph-96/python_voice_assistant_with_PySide6")
+
+
+    # def shutdown(self):
+    #     """
+    #         This function shutdown your computer
+    #     :return:
+    #     """
+    #     self.speak("Do you really want to shutdown?")
+    #     answer = self.take_command().lower()
+    #     if answer == "yes":
+    #         self.speak("Shutting down the computer")
+    #         os.startfile(os.fspath(Path(__file__).resolve().parent / "system/shutdown.bat"))
+    #     elif answer == "no":
+    #         self.speak("Process abort")
+    #     else:
+    #         self.speak("I do not understand. Process abort")
+    #
+    # def restart(self):
+    #     """
+    #         This function reboot your computer
+    #     :return:
+    #     """
+    #     self.speak("Do you really want to restart?")
+    #     answer = self.take_command().lower()
+    #     if answer == "yes":
+    #         self.speak("Reboot")
+    #         os.system("shutdown /r /t 1")
+    #     elif answer == "no":
+    #         self.speak("Process abort")
+    #     else:
+    #         self.speak("I do not understand. Process abort")
+    #
+    # def logout(self):
+    #     """
+    #         This function logout from your current windows session
+    #     :return:
+    #     """
+    #     self.speak("Do you really want to logout?")
+    #     answer = self.take_command().lower()
+    #     if answer == "yes":
+    #         self.speak("Logout")
+    #         os.startfile("shutdown -l")
+    #     elif answer == "no":
+    #         self.speak("Process abort")
+    #     else:
+    #         self.speak("I do not understand. Process abort")

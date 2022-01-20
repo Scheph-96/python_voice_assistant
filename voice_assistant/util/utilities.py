@@ -23,6 +23,7 @@ const.PICTURESPATH = os.path.normpath(os.path.expanduser("~/Pictures/")) + "\\"
 const.VIDEOSPATH = os.path.normpath(os.path.expanduser("~/Videos/")) + "\\"
 const.DOCUMENTSPATH = os.path.normpath(os.path.expanduser("~/Documents/")) + "\\"
 const.MUSICPATH = os.path.normpath(os.path.expanduser("~/Music/")) + "\\"
+const.DOWNLOADSPATH = os.path.normpath(os.path.expanduser("~/Downloads/")) + "\\"
 const.STARTMENUPATH = os.environ['SYSTEMDRIVE'] + "\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\"
 ALLPATH = [const.DESKTOPPATH, const.PICTURESPATH, const.VIDEOSPATH, const.DOCUMENTSPATH, const.MUSICPATH,
            const.STARTMENUPATH, const.USEFULLPATH]
@@ -168,21 +169,26 @@ def task_controller(helena, userInput, standbyEvent, patterns):
         standbyEvent.set()
         thread = Thread(target=standby, args=[standbyEvent, ])
         thread.start()
-    elif code == "00shutdown00":
-        helena.shutdown()
+    elif code == "00source00code":
+        helena.launch_source_code_page()
         standbyEvent.set()
         thread = Thread(target=standby, args=[standbyEvent, ])
         thread.start()
-    elif code == "00reboot00":
-        helena.restart()
-        standbyEvent.set()
-        thread = Thread(target=standby, args=[standbyEvent, ])
-        thread.start()
-    elif code == "00logout00":
-        helena.logout()
-        standbyEvent.set()
-        thread = Thread(target=standby, args=[standbyEvent, ])
-        thread.start()
+    # elif code == "00shutdown00":
+    #     helena.shutdown()
+    #     standbyEvent.set()
+    #     thread = Thread(target=standby, args=[standbyEvent, ])
+    #     thread.start()
+    # elif code == "00reboot00":
+    #     helena.restart()
+    #     standbyEvent.set()
+    #     thread = Thread(target=standby, args=[standbyEvent, ])
+    #     thread.start()
+    # elif code == "00logout00":
+    #     helena.logout()
+    #     standbyEvent.set()
+    #     thread = Thread(target=standby, args=[standbyEvent, ])
+    #     thread.start()
     elif code == "00file00launcher00":
         helena.file_launcher()
         standbyEvent.set()

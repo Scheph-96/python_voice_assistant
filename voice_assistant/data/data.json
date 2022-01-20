@@ -56,6 +56,18 @@
                 {
                     "code": "00file00launcher00",
                     "pattern": "(launch|start).*(file)?"
+                },
+                {
+                    "code": "00source00code",
+                    "pattern": "(show|display).*source code"
+                },
+                {
+                    "code": "00download00source00code00",
+                    "pattern": ".*download.*"
+                },
+                {
+                    "code": "00open00source00code00",
+                    "pattern": ".*open.*"
                 }
             ]
         },
@@ -109,6 +121,18 @@
                 {
                     "code": "00file00launcher00",
                     "pattern": "(lance|démarre).*fichier.*"
+                },
+                {
+                    "code": "00source00code",
+                    "pattern": "(montre|affiche).*code source"
+                },
+                {
+                    "code": "00download00source00code00",
+                    "pattern": ".*(télécharge|télécharger).*"
+                },
+                {
+                    "code": "00open00source00code00",
+                    "pattern": ".*(ouvre|ouvrir).*"
                 }
             ]
         }
