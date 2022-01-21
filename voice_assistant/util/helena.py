@@ -1,21 +1,20 @@
 # import all necessary modules
 
+import os
+import re
 import threading
 import time
-import re
 import webbrowser
-from pathlib import Path
-from subprocess import check_output
-
-import pyttsx3
 from datetime import datetime
+from pathlib import Path
+
+import pyautogui
+import pyttsx3
 import speech_recognition as sr
 import wikipedia
-import os
-import pyautogui
-import voice_assistant.util.utilities
-
 from pygame import mixer
+
+import voice_assistant.util.utilities
 from voice_assistant.util.tinyDBModal import LocalStorage
 
 
@@ -34,8 +33,7 @@ class Helena:
         self.__engine.setProperty('rate', 120)
         self.__localStorage = LocalStorage()
 
-    @staticmethod
-    def change_voice(engine):
+    def change_voice(self, engine):
         """
             This function changes the voice of Helena according to the voice properties of the OS.
         :param engine: pyttsx3 instance: Helena's voice engine
@@ -256,7 +254,8 @@ class Helena:
         self.speak("Which file would you like to launch?")
         to_launch = self.take_command().lower()
         resultAvailable = threading.Event()
-        thread = threading.Thread(target=voice_assistant.util.utilities.search_engine, args=[to_launch, resultAvailable, ])
+        thread = threading.Thread(target=voice_assistant.util.utilities.search_engine,
+                                  args=[to_launch, resultAvailable, ])
         thread.start()
         voice_assistant.util.utilities.search_control(resultAvailable, self.speak)
 
@@ -304,7 +303,7 @@ class Helena:
                 if int(bin(asciiCode)[2:]) != 100000:
                     binaryList.append(str(int(bin(asciiCode)[2:])))
 
-            result = string+" in binary is "+"".join(binaryList)
+            result = string + " in binary is " + "".join(binaryList)
             print(result)
             self.speak(result)
 
@@ -326,7 +325,6 @@ class Helena:
         # el
         if code == "00open00source00code00":
             webbrowser.open("https://github.com/Scheph-96/python_voice_assistant_with_PySide6")
-
 
     # def shutdown(self):
     #     """
