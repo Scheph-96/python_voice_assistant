@@ -235,7 +235,7 @@ def search_control(resultAvailable, speak):
 
     global filesFound
 
-    while not resultAvailable.wait(timeout=5):
+    while not resultAvailable.wait(timeout=15):
         speak("Searching! Please wait")
 
     # All files matching the request are put in ine filesFound list.
@@ -247,6 +247,7 @@ def search_control(resultAvailable, speak):
             os.startfile(filesFound[0])
         else:
             speak("I found " + str(len(filesFound)) + " files corresponding to your request")
+            print(filesFound)
     elif len(filesFound) == 0:
         speak("There is no file matching your request")
 
@@ -273,6 +274,7 @@ def search_engine(filename, resultAvailable):
         if type(path) is str:
             for root, directories, files in os.walk(path):
                 for name in files:
+                    print(os.path.join(root, name))
                     if filename in name.lower():
                         filepath = os.path.join(root, name)
                         filesFound.append(filepath)
@@ -281,6 +283,7 @@ def search_engine(filename, resultAvailable):
             for systemDrivePath in path:
                 for root, directories, files in os.walk(systemDrivePath):
                     for name in files:
+                        print(os.path.join(root, name))
                         if filename in name.lower():
                             filepath = os.path.join(root, name)
                             filesFound.append(filepath)
@@ -289,6 +292,7 @@ def search_engine(filename, resultAvailable):
     for path in os_mount_points():
         for root, directories, files in os.walk(path):
             for name in files:
+                print(os.path.join(root, name))
                 if filename in name.lower():
                     filepath = os.path.join(root, name)
                     filesFound.append(filepath)

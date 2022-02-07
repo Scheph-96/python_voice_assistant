@@ -30,7 +30,7 @@ class Helena:
             The constructor for Helena Class
         """
         self.__engine = pyttsx3.init()
-        self.__engine.setProperty('rate', 120)
+        self.__engine.setProperty('rate', 130)
         self.__localStorage = LocalStorage()
 
     def change_voice(self, engine):
@@ -253,11 +253,60 @@ class Helena:
         """
         self.speak("Which file would you like to launch?")
         to_launch = self.take_command().lower()
-        resultAvailable = threading.Event()
-        thread = threading.Thread(target=voice_assistant.util.utilities.search_engine,
-                                  args=[to_launch, resultAvailable, ])
-        thread.start()
-        voice_assistant.util.utilities.search_control(resultAvailable, self.speak)
+        print(to_launch)
+
+        if to_launch != "":
+            self.speak("Do you want to launch "+to_launch+"?")
+            confirm = self.take_command().lower()
+            if confirm in ["yes", "no"]:
+                if confirm == "yes":
+                    self.speak("Searching for "+to_launch)
+                    resultAvailable = threading.Event()
+                    thread = threading.Thread(target=voice_assistant.util.utilities.search_engine,
+                                              args=[to_launch, resultAvailable, ])
+                    thread.start()
+                    voice_assistant.util.utilities.search_control(resultAvailable, self.speak)
+                else:
+                    time.sleep(0.3)
+                    self.speak("Would you like to try again ?")
+                    while True:
+                        query = self.take_command().lower()
+                        if query not in ["yes", "no"]:
+                            self.speak("Please just say yes or no")
+                        else:
+                            if query == "yes":
+                                self.file_launcher()
+                                break
+                            else:
+                                self.speak("cancelled")
+                                break
+            else:
+                self.speak("Please just say yes or no")
+                while True:
+                    query = self.take_command().lower()
+                    if query not in ["yes", "no"]:
+                        self.speak("Please just say yes or no")
+                    else:
+                        if query == "yes":
+                            self.file_launcher()
+                            break
+                        else:
+                            self.speak("cancelled")
+        else:
+            self.speak("I don't get what you are saying !")
+            time.sleep(0.3)
+            self.speak("Would you like to try again ?")
+            while True:
+                query = self.take_command().lower()
+                if query not in ["yes", "no"]:
+                    self.speak("Please just say yes or no")
+                else:
+                    if query == "yes":
+                        self.file_launcher()
+                        break
+                    else:
+                        self.speak("cancelled")
+                        break
 
     def screenshot(self):
         """
@@ -308,23 +357,27 @@ class Helena:
             self.speak(result)
 
     def launch_source_code_page(self):
-        self.speak("Would you like to see the web page or directly download the source code?")
-        answer = self.take_command().lower()
-
-        code = ""
-        localStorage = LocalStorage()
-        patterns = localStorage.getPatterns()
-        for pattern in patterns:
-            if re.search(pattern['pattern'], answer):
-                code = pattern['code']
-                break
+        """
+            This function launch the source code github page
+        :return:
+        """
+        # self.speak("Would you like to see the web page or directly download the source code?")
+        # answer = self.take_command().lower()
+        #
+        # code = ""
+        # localStorage = LocalStorage()
+        # patterns = localStorage.getPatterns()
+        # for pattern in patterns:
+        #     if re.search(pattern['pattern'], answer):
+        #         code = pattern['code']
+        #         break
 
         # if code == "00download00source00code00":
         #     cmd = '!git clone https://github.com/Scheph-96/python_voice_assistant_with_PySide6.git '+voice_assistant.util.utilities.DOWNLOADSPATH
         #     check_output(cmd, shell=True).decode()
         # el
-        if code == "00open00source00code00":
-            webbrowser.open("https://github.com/Scheph-96/python_voice_assistant_with_PySide6")
+        # if code == "00open00source00code00":
+        webbrowser.open("https://github.com/Scheph-96/python_voice_assistant_with_PySide6")
 
     # def shutdown(self):
     #     """
