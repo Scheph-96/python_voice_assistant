@@ -67,7 +67,7 @@
                 },
                 {
                     "code": "00open00source00code00",
-                    "pattern": ".*open.*"
+                    "pattern": ".*open.*source code.*"
                 }
             ]
         },
@@ -132,14 +132,14 @@
                 },
                 {
                     "code": "00open00source00code00",
-                    "pattern": ".*(ouvre|ouvrir).*"
+                    "pattern": ".*(ouvre|ouvrir).*code source.*"
                 }
             ]
         }
     },
     "userData": {
         "1": {
-            "memorize": [
+            "memories": [
                 {
                     "date": "Monday January 17, 2022",
                     "hour": "23:53:32",

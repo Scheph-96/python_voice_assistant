@@ -13,6 +13,7 @@ import pyttsx3
 import speech_recognition as sr
 import wikipedia
 from pygame import mixer
+from deep_translator import GoogleTranslator
 
 import voice_assistant.util.utilities
 from voice_assistant.util.tinyDBModal import LocalStorage
@@ -32,6 +33,7 @@ class Helena:
         self.__engine = pyttsx3.init()
         self.__engine.setProperty('rate', 130)
         self.__localStorage = LocalStorage()
+        self.__appLanguage = self.__localStorage.getFieldValue("appData", "language")
 
     def change_voice(self, engine):
         """
@@ -52,7 +54,7 @@ class Helena:
         :return:
         """
         self.change_voice(self.__engine)
-        self.__engine.say(text)
+        self.__engine.say(GoogleTranslator(source="auto", target=self.__appLanguage).translate(text))
         self.__engine.runAndWait()
 
     def who_am_i(self):
@@ -62,7 +64,7 @@ class Helena:
         """
         identity = "I am Helena, version 1.0,  your voice assistant develop by Omar. I was created to make your life" \
                    " easier and to answer your needs regarding your computer. I am only a prototype that is not completely" \
-                   " perfected but I will do my best to satisfy you "
+                   " perfected but I will do my best to satisfy you"
         self.speak(identity)
 
     # Order listening function
@@ -71,14 +73,14 @@ class Helena:
             This function convert user's voice input in text
         :return: string: User voice input as text
         """
-        print("speak")
+        print(GoogleTranslator(source="auto", target=self.__appLanguage).translate("speak"))
         recognize = sr.Recognizer()
         with sr.Microphone() as source:
             recognize.adjust_for_ambient_noise(source)
             audio = recognize.listen(source)
 
         try:
-            print("Recognizing...")
+            print(GoogleTranslator(source="auto", target=self.__appLanguage).translate("Recognizing..."))
             query = recognize.recognize_google(audio)
             return query
         except Exception as e:
@@ -105,10 +107,10 @@ class Helena:
         self.speak(username)
         self.speak("Are you sure you want to save it ?")
         agreement = self.take_command().lower()
-        if agreement not in ["yes", "no"]:
+        if agreement not in [GoogleTranslator(source="auto", target=self.__appLanguage).translate("yes"), GoogleTranslator(source="auto", target=self.__appLanguage).translate("no")]:
             self.speak("Just say yes or no")
         else:
-            if agreement == "yes":
+            if agreement == GoogleTranslator(source="auto", target=self.__appLanguage).translate("yes"):
                 localStorage = LocalStorage()
                 localStorage.insertUsername(username)
             else:
@@ -166,10 +168,10 @@ class Helena:
             self.speak("Would you like to try again ?")
             while True:
                 answer = self.take_command().lower()
-                if answer not in ["yes", "no"]:
+                if answer not in [GoogleTranslator(source="auto", target=self.__appLanguage).translate("yes"), GoogleTranslator(source="auto", target=self.__appLanguage).translate("no")]:
                     self.speak("Please just say yes or no")
                 else:
-                    if answer == "yes":
+                    if answer == GoogleTranslator(source="auto", target=self.__appLanguage).translate("yes"):
                         self.wikipedia_search()
                         break
                     else:
@@ -178,11 +180,10 @@ class Helena:
         else:
             try:
                 self.speak("Searching for " + query)
-                appLanguage = self.__localStorage.getFieldValue("appData", "language")
 
-                if appLanguage == "english":
+                if self.__appLanguage == "english":
                     wikipedia.set_lang("en")
-                elif appLanguage == "french":
+                elif self.__appLanguage == "french":
                     wikipedia.set_lang("fr")
 
                 result = wikipedia.summary(query, sentences=5, auto_suggest=False, redirect=True)
@@ -194,10 +195,10 @@ class Helena:
                 self.speak("Something went wrong with your request. Would you like to start over?")
                 while True:
                     query = self.take_command().lower()
-                    if query not in ["yes", "no"]:
+                    if query not in [GoogleTranslator(source="auto", target=self.__appLanguage).translate("yes"), GoogleTranslator(source="auto", target=self.__appLanguage).translate("no")]:
                         self.speak("Please just say yes or no")
                     else:
-                        if query == "yes":
+                        if query == GoogleTranslator(source="auto", target=self.__appLanguage).translate("yes"):
                             self.wikipedia_search()
                             break
                         else:
@@ -234,79 +235,122 @@ class Helena:
             self.speak("Would you like to try again ?")
             while True:
                 query = self.take_command().lower()
-                if query not in ["yes", "no"]:
+                if query not in [GoogleTranslator(source="auto", target=self.__appLanguage).translate("yes"), GoogleTranslator(source="auto", target=self.__appLanguage).translate("no")]:
                     self.speak("Please just say yes or no")
                 else:
-                    if query == "yes":
+                    if query == GoogleTranslator(source="auto", target=self.__appLanguage).translate("yes"):
                         self.to_remember()
                         break
                     else:
                         self.speak("cancelled")
                         break
 
-    def file_launcher(self):
-        """
-            This function looks for a file or group of file matching your request
-        :return:
-        :NB: This feature is not optimized, it may take some time depending on your computer capacities,
-         so search time will vary between 1 second and 3 hours depending on the file searched
-        """
-        self.speak("Which file would you like to launch?")
-        to_launch = self.take_command().lower()
-        print(to_launch)
-
-        if to_launch != "":
-            self.speak("Do you want to launch "+to_launch+"?")
-            confirm = self.take_command().lower()
-            if confirm in ["yes", "no"]:
-                if confirm == "yes":
-                    self.speak("Searching for "+to_launch)
-                    resultAvailable = threading.Event()
-                    thread = threading.Thread(target=voice_assistant.util.utilities.search_engine,
-                                              args=[to_launch, resultAvailable, ])
-                    thread.start()
-                    voice_assistant.util.utilities.search_control(resultAvailable, self.speak)
-                else:
-                    time.sleep(0.3)
-                    self.speak("Would you like to try again ?")
-                    while True:
-                        query = self.take_command().lower()
-                        if query not in ["yes", "no"]:
-                            self.speak("Please just say yes or no")
-                        else:
-                            if query == "yes":
-                                self.file_launcher()
-                                break
-                            else:
-                                self.speak("cancelled")
-                                break
-            else:
-                self.speak("Please just say yes or no")
-                while True:
-                    query = self.take_command().lower()
-                    if query not in ["yes", "no"]:
-                        self.speak("Please just say yes or no")
-                    else:
-                        if query == "yes":
-                            self.file_launcher()
-                            break
-                        else:
-                            self.speak("cancelled")
-        else:
-            self.speak("I don't get what you are saying !")
-            time.sleep(0.3)
-            self.speak("Would you like to try again ?")
-            while True:
-                query = self.take_command().lower()
-                if query not in ["yes", "no"]:
-                    self.speak("Please just say yes or no")
-                else:
-                    if query == "yes":
-                        self.file_launcher()
-                        break
-                    else:
-                        self.speak("cancelled")
-                        break
+    # def file_launcher(self):
+    #     """
+    #         This function looks for a file or group of file matching your request
+    #     :return:
+    #     :NB: This feature is not optimized, it may take some time depending on your computer capacities,
+    #      so search time will vary between 1 second and 3 hours depending on the file searched
+    #     """
+    #
+    #     isFind = False
+    #
+    #     self.speak("Which file would you like to launch?")
+    #     to_launch = self.take_command().lower()
+    #     print(to_launch)
+    #
+    #     if to_launch != "":
+    #         self.speak("Do you want to launch "+to_launch+"?")
+    #         confirm = self.take_command().lower()
+    #         if confirm in ["yes", "no"]:
+    #             if confirm == "yes":
+    #                 self.speak("Searching for "+to_launch)
+    #
+    #                 resultAvailable = threading.Event()
+    #                 thread = threading.Thread(target=voice_assistant.util.utilities.search_engine,
+    #                                           args=[to_launch, resultAvailable, ])
+    #                 thread.start()
+    #                 filesFound = voice_assistant.util.utilities.search_control(resultAvailable, self.speak)
+    #
+    #                 self.speak("Which one would you like to launch?")
+    #                 choice = self.take_command().lower()
+    #
+    #                 for path in filesFound:
+    #                     if choice in path:
+    #                         isFind = True
+    #                         os.startfile(path)
+    #                         break
+    #
+    #                 if not isFind:
+    #                     self.speak("There is no file in the result named like that")
+    #
+    #                 time.sleep(0.3)
+    #                 self.speak("Would you like to try again to launch a file in the above list?")
+    #                 while True:
+    #                     query = self.take_command().lower()
+    #                     if query not in ["yes", "no"]:
+    #                         self.speak("Please just say yes or no")
+    #                     else:
+    #                         if query == "yes":
+    #                             pass
+    #                             # self.file_launcher()
+    #                             # break
+    #                         else:
+    #                             self.speak("Would you like to launch another file?")
+    #                             while True:
+    #                                 query = self.take_command().lower()
+    #                                 if query not in ["yes", "no"]:
+    #                                     self.speak("Please just say yes or no")
+    #                                 else:
+    #                                     if query == "yes":
+    #                                         self.file_launcher()
+    #                                         break
+    #                                     else:
+    #                                         self.speak("cancelled")
+    #                                         break
+    #                             self.speak("cancelled")
+    #                             break
+    #             else:
+    #                 time.sleep(0.3)
+    #                 self.speak("Would you like to try again ?")
+    #                 while True:
+    #                     query = self.take_command().lower()
+    #                     if query not in ["yes", "no"]:
+    #                         self.speak("Please just say yes or no")
+    #                     else:
+    #                         if query == "yes":
+    #                             self.file_launcher()
+    #                             break
+    #                         else:
+    #                             self.speak("cancelled")
+    #                             break
+    #         else:
+    #             self.speak("Please just say yes or no")
+    #             while True:
+    #                 query = self.take_command().lower()
+    #                 if query not in ["yes", "no"]:
+    #                     self.speak("Please just say yes or no")
+    #                 else:
+    #                     if query == "yes":
+    #                         self.file_launcher()
+    #                         break
+    #                     else:
+    #                         self.speak("cancelled")
+    #     else:
+    #         self.speak("I don't get what you are saying !")
+    #         time.sleep(0.3)
+    #         self.speak("Would you like to try again ?")
+    #         while True:
+    #             query = self.take_command().lower()
+    #             if query not in ["yes", "no"]:
+    #                 self.speak("Please just say yes or no")
+    #             else:
+    #                 if query == "yes":
+    #                     self.file_launcher()
+    #                     break
+    #                 else:
+    #                     self.speak("cancelled")
+    #                     break
 
     def screenshot(self):
         """
@@ -336,10 +380,10 @@ class Helena:
             self.speak("Would you like to try again ?")
             while True:
                 answer = self.take_command().lower()
-                if answer not in ["yes", "no"]:
+                if answer not in [GoogleTranslator(source="auto", target=self.__appLanguage).translate("yes"), GoogleTranslator(source="auto", target=self.__appLanguage).translate("no")]:
                     self.speak("Please just say yes or no")
                 else:
-                    if answer == "yes":
+                    if answer == GoogleTranslator(source="auto", target=self.__appLanguage).translate("yes"):
                         self.string_to_binary()
                         break
                     else:

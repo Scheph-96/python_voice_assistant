@@ -78,4 +78,4 @@ class LocalStorage(object):
         :param memory: dictionary: Memories pattern
         :return:
         """
-        self.__database.table("userData").update(add("memorize", [memory]), Query()["memorize"].exists())
+        self.__database.table("userData").update(add("memories", [memory]), Query()["memories"].exists())
