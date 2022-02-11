@@ -156,7 +156,7 @@ class Helena:
 
     def wikipedia_search(self):
         """
-            This function makes a research on wikipedia and return the first 3 sentences.
+            This function makes a research on wikipedia and return the first r sentences.
         :return:
         """
         self.speak("what should i look for?")
